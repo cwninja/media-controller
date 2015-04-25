@@ -4,6 +4,40 @@ import "encoding/xml"
 import "io"
 import "bytes"
 
+func SetAVTransportURI(uri string) (io.Reader, string) {
+  return newEnvelope(
+    setAVTransportURI{
+      CurrentURI: uri,
+      InstanceID: "0",
+    },
+  ), NAMESPACE + "#SetAVTransportURI"
+}
+
+func Play(speed int) (io.Reader, string) {
+  return newEnvelope(
+    play{
+      Speed: speed,
+      InstanceID: "0",
+    },
+  ), NAMESPACE + "#Play"
+}
+
+func Stop() (io.Reader, string) {
+  return newEnvelope(stop{ InstanceID: "0" }), NAMESPACE + "#Stop"
+}
+
+func Pause() (io.Reader, string) {
+  return newEnvelope(pause{ InstanceID: "0" }), NAMESPACE + "#Pause"
+}
+
+func GetTransportInfo() (io.Reader, string) {
+  return newEnvelope(getTransportInfo{ InstanceID: "0" }), NAMESPACE + "#GetTransportInfo"
+}
+
+func GetPositionInfo() (io.Reader, string) {
+  return newEnvelope(getPositionInfo{ InstanceID: "0" }), NAMESPACE + "#GetPositionInfo"
+}
+
 const (
   NAMESPACE = "urn:schemas-upnp-org:service:AVTransport:1"
 )
@@ -67,36 +101,3 @@ type setAVTransportURI struct {
   CurrentURIMetaData  string     `xml:"urn:schemas-upnp-org:service:AVTransport:1 CurrentURIMetaData"`
 }
 
-func SetAVTransportURI(uri string) (io.Reader, string) {
-  return newEnvelope(
-    setAVTransportURI{
-      CurrentURI: uri,
-      InstanceID: "0",
-    },
-  ), NAMESPACE + "#SetAVTransportURI"
-}
-
-func Play(speed int) (io.Reader, string) {
-  return newEnvelope(
-    play{
-      Speed: speed,
-      InstanceID: "0",
-    },
-  ), NAMESPACE + "#Play"
-}
-
-func Stop() (io.Reader, string) {
-  return newEnvelope(stop{ InstanceID: "0" }), NAMESPACE + "#Stop"
-}
-
-func Pause() (io.Reader, string) {
-  return newEnvelope(pause{ InstanceID: "0" }), NAMESPACE + "#Pause"
-}
-
-func GetTransportInfo() (io.Reader, string) {
-  return newEnvelope(getTransportInfo{ InstanceID: "0" }), NAMESPACE + "#GetTransportInfo"
-}
-
-func GetPositionInfo() (io.Reader, string) {
-  return newEnvelope(getPositionInfo{ InstanceID: "0" }), NAMESPACE + "#GetPositionInfo"
-}

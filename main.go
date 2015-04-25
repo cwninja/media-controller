@@ -3,9 +3,12 @@ package main
 import "github.com/cwninja/media-controller/tv"
 import "flag"
 import "log"
+import "fmt"
+import "os"
 
 func main() {
-  tvUrl := flag.String("tv", "http://192.168.0.120:55000/dmr/control_2", "URL for TV.")
+  log.SetFlags(0)
+  tvUrl := flag.String("tv", os.Getenv("TV_CONTROL_URL"), "URL for TV.")
   flag.Parse()
 
   if flag.NArg() < 1 {
@@ -20,14 +23,21 @@ func main() {
     myTv.LoadMedia(flag.Arg(1))
     myTv.Play(1)
   } else if command == "pause" {
-    myTv.Pause()
-  } else if command == "resume" {
-    myTv.Play(1)
+    status := myTv.GetTransportInfo()
+    if status == tv.STATUS_PAUSED {
+      myTv.Play(1)
+    } else if status == tv.STATUS_PLAYING {
+      myTv.Pause()
+    } else {
+      log.Fatal("Not playing")
+    }
   } else if command == "stop" {
     myTv.Stop()
   } else if command == "info" {
-    myTv.GetTransportInfo()
-  } else if command == "pos" {
-    myTv.GetPositionInfo()
+    status := myTv.GetTransportInfo()
+    posInfo := myTv.GetPositionInfo()
+    fmt.Printf("Url: %s\n%s  -  Progress: %d/%d\n", posInfo.URI, status, posInfo.Position, posInfo.Duration)
+  } else {
+    log.Fatal("Unknown command")
   }
 }
