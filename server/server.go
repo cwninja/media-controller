@@ -4,7 +4,6 @@ import "net"
 import "github.com/cwninja/media-controller/tv"
 import "github.com/yasuyuky/jsonpath"
 import "bufio"
-import "log"
 import "time"
 import "bytes"
 import jsonEncoding "encoding/json"
@@ -54,12 +53,9 @@ func (s * Server) HandleConnection(c * net.TCPConn) {
         position, _ := jsonpath.GetNumber(json, []interface{}{"position"}, 0)
         s.TV.PlayFrom(url, int(position))
       } else if command == "status" {
-        if data, err := jsonEncoding.Marshal(s.TV.Status()); err == nil {
-          c.Write(data)
-          c.Write([]byte{'\n'})
-        } else {
-          log.Fatal(err)
-        }
+        data, _ := jsonEncoding.Marshal(s.TV.Status())
+        c.Write(data)
+        c.Write([]byte{'\n'})
       } else if command == "seek_to" {
         position, _ := jsonpath.GetNumber(json, []interface{}{"position"}, 0)
         s.TV.SeekTo(int(position))
@@ -68,12 +64,9 @@ func (s * Server) HandleConnection(c * net.TCPConn) {
         s.TV.SeekBy(int(seconds))
       } else if command == "monitor" {
         for {
-          if data, err := jsonEncoding.Marshal(s.TV.Status()); err == nil {
-            c.Write(data)
-            c.Write([]byte{'\n'})
-          } else {
-            log.Fatal(err)
-          }
+          data, _ := jsonEncoding.Marshal(s.TV.Status())
+          c.Write(data)
+          c.Write([]byte{'\n'})
           time.Sleep(time.Second)
         }
       }

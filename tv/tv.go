@@ -18,8 +18,8 @@ func NewTV(url string) TV {
 func (tv * TV) PlayFrom(url string, seconds int) {
   tv.sendSoapMessage(messages.Stop())
   tv.sendSoapMessage(messages.SetAVTransportURI(url))
-  tv.sendSoapMessage(messages.Seek(messages.SEEK_REL_TIME, formatTime(seconds)))
   tv.sendSoapMessage(messages.Play(1))
+  tv.sendSoapMessage(messages.Seek(messages.SEEK_REL_TIME, formatTime(seconds)))
 }
 
 func (tv * TV) Play(url string) {

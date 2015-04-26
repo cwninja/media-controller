@@ -20,12 +20,14 @@ var currentTransportStatePath = xmlpath.MustCompile("//CurrentTransportState")
 func (tv * TV) GetTransportInfo() PlaybackStatus {
   response, err := tv.sendSoapMessage(messages.GetTransportInfo())
   if err != nil {
-    log.Fatal(err)
+    log.Printf("SOAP Error: %s", err)
+    return STATUS_UNKNOWN
   }
 
   root, err := xmlpath.Parse(bytes.NewBuffer(response))
   if err != nil {
-    log.Fatal(err)
+    log.Printf("Bad XML from server: %s", err)
+    return STATUS_UNKNOWN
   }
 
   if value, ok := currentTransportStatePath.String(root); ok {

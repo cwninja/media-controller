@@ -14,7 +14,8 @@ type PositionInfo struct {
 func (tv * TV) GetPositionInfo() (info PositionInfo) {
   response, err := tv.sendSoapMessage(messages.GetPositionInfo())
   if err != nil {
-    log.Fatal(err)
+    log.Println(err)
+    return
   }
 
   trackUriPath := xmlpath.MustCompile("//TrackURI")
@@ -23,7 +24,8 @@ func (tv * TV) GetPositionInfo() (info PositionInfo) {
 
   root, err := xmlpath.Parse(bytes.NewBuffer(response))
   if err != nil {
-    log.Fatal(err)
+    log.Println(err)
+    return
   }
 
   if value, ok := trackUriPath.String(root); ok {
