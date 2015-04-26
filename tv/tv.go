@@ -4,6 +4,7 @@ import "github.com/cwninja/media-controller/messages"
 import "launchpad.net/xmlpath"
 import "net/http"
 import "io"
+import "os"
 import "io/ioutil"
 import "fmt"
 import "log"
@@ -37,7 +38,7 @@ func (tv * TV) sendSoapMessage(body io.Reader, action string) (responseBody []by
   }
 
   if response.StatusCode != 200 {
-    log.Println(request)
+    io.Copy(os.Stderr, response.Body)
     log.Fatal(response.Status)
     return responseBody, errors.New(response.Status)
   }
