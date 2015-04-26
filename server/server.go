@@ -52,8 +52,7 @@ func (s * Server) HandleConnection(c * net.TCPConn) {
       } else if command == "play" {
         url, _ := jsonpath.GetString(json, []interface{}{"url"}, "")
         position, _ := jsonpath.GetNumber(json, []interface{}{"position"}, 0)
-        log.Printf("No seek support implemnted: %f", position)
-        s.TV.Play(url)
+        s.TV.PlayFrom(url, int(position))
       } else if command == "status" {
         if data, err := jsonEncoding.Marshal(s.TV.Status()); err == nil {
           c.Write(data)

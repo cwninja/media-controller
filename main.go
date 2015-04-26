@@ -26,6 +26,10 @@ func main() {
     log.Fatal("Please provide at least a command")
   }
 
+  if *tvUrl == "" {
+    log.Fatal("Please provide a tv URL")
+  }
+
   myTv := tv.NewTV(*tvUrl)
   command := flag.Arg(0)
 
