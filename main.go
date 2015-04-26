@@ -35,19 +35,10 @@ func main() {
     } else {
       url = file
     }
+    myTv.Play(url)
 
-    myTv.Stop()
-    myTv.LoadMedia(url)
-    myTv.Play(1)
   } else if command == "pause" {
-    status := myTv.GetTransportInfo()
-    if status == tv.STATUS_PAUSED {
-      myTv.Play(1)
-    } else if status == tv.STATUS_PLAYING {
-      myTv.Pause()
-    } else {
-      log.Fatal("Not playing")
-    }
+    myTv.Pause()
   } else if command == "stop" {
     myTv.Stop()
   } else if command == "info" {

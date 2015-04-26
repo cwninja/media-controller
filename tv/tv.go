@@ -15,12 +15,10 @@ func NewTV(url string) TV {
   }
 }
 
-func (tv * TV) LoadMedia(url string) {
+func (tv * TV) Play(url string) {
+  tv.sendSoapMessage(messages.Stop())
   tv.sendSoapMessage(messages.SetAVTransportURI(url))
-}
-
-func (tv * TV) Play(speed int) {
-  tv.sendSoapMessage(messages.Play(speed))
+  tv.sendSoapMessage(messages.Play(1))
 }
 
 func (tv * TV) Stop() {
@@ -28,5 +26,10 @@ func (tv * TV) Stop() {
 }
 
 func (tv * TV) Pause() {
-  tv.sendSoapMessage(messages.Pause())
+  status := tv.GetTransportInfo()
+  if status == STATUS_PAUSED {
+    tv.sendSoapMessage(messages.Play(1))
+  } else if status == STATUS_PLAYING {
+    tv.sendSoapMessage(messages.Pause())
+  }
 }
