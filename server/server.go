@@ -6,6 +6,7 @@ import "github.com/yasuyuky/jsonpath"
 import "bufio"
 import "log"
 import "time"
+import "bytes"
 import jsonEncoding "encoding/json"
 
 
@@ -42,7 +43,9 @@ func (s * Server) HandleConnection(c * net.TCPConn) {
   for messageScanner.Scan() {
     if json, err := jsonpath.DecodeString(messageScanner.Text()); err == nil {
       command, _ := jsonpath.GetString(json, []interface{}{"command"}, "")
-      if command == "stop" || command == "exit" {
+      if command == "players" {
+        c.Write(bytes.NewBufferString("{\"default\":\"http://example.com/multiple-players-not-supported\"}\n").Bytes())
+      } else if command == "stop" || command == "exit" {
         s.TV.Stop()
       } else if command == "pause" {
         s.TV.Pause()
@@ -58,6 +61,12 @@ func (s * Server) HandleConnection(c * net.TCPConn) {
         } else {
           log.Fatal(err)
         }
+      } else if command == "seek_to" {
+        position, _ := jsonpath.GetNumber(json, []interface{}{"position"}, 0)
+        s.TV.SeekTo(int(position))
+      } else if command == "seek_by" {
+        seconds, _ := jsonpath.GetNumber(json, []interface{}{"seconds"}, 0)
+        s.TV.SeekBy(int(seconds))
       } else if command == "monitor" {
         for {
           if data, err := jsonEncoding.Marshal(s.TV.Status()); err == nil {
