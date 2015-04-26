@@ -14,6 +14,57 @@ import "time"
 // A global wait group to decide when it's OK to exit the process.
 var wg sync.WaitGroup
 
+func main() {
+  log.SetFlags(0)
+  tvUrl := flag.String("tv", os.Getenv("TV_CONTROL_URL"), "URL for TV.")
+  flag.Parse()
+
+  if flag.NArg() < 1 {
+    log.Fatal("Please provide at least a command")
+  }
+
+  myTv := tv.NewTV(*tvUrl)
+  command := flag.Arg(0)
+
+  if command == "play" {
+    file := flag.Arg(1)
+
+    var url string
+    if _, err := os.Stat(file); err == nil {
+      url = makeFileRemotelyAccessibleToTv(myTv, file)
+    } else {
+      url = file
+    }
+
+    myTv.Stop()
+    myTv.LoadMedia(url)
+    myTv.Play(1)
+  } else if command == "pause" {
+    status := myTv.GetTransportInfo()
+    if status == tv.STATUS_PAUSED {
+      myTv.Play(1)
+    } else if status == tv.STATUS_PLAYING {
+      myTv.Pause()
+    } else {
+      log.Fatal("Not playing")
+    }
+  } else if command == "stop" {
+    myTv.Stop()
+  } else if command == "info" {
+    status := myTv.GetTransportInfo()
+    posInfo := myTv.GetPositionInfo()
+    fmt.Printf("Url: %s\n%s  -  Progress: %d/%d\n", posInfo.URI, status, posInfo.Position, posInfo.Duration)
+  } else {
+    log.Fatal("Unknown command")
+  }
+
+  // We may have spun up a HTTP server, so wait for it to not be in use. If we
+  // are serving a remote URL, we'll just return immediately.
+  wg.Wait()
+}
+
+
+
 func findHostAndPort(remoteAddress string) string {
   // What host/port should we serve from? Because the TV needs to access
   // it, we make a brief connection out to the TV, and then use the
@@ -64,50 +115,3 @@ func makeFileRemotelyAccessibleToTv(myTv tv.TV, file string) string {
   return url
 }
 
-func main() {
-  log.SetFlags(0)
-  tvUrl := flag.String("tv", os.Getenv("TV_CONTROL_URL"), "URL for TV.")
-  flag.Parse()
-
-  if flag.NArg() < 1 {
-    log.Fatal("Please provide at least a command")
-  }
-
-  myTv := tv.NewTV(*tvUrl)
-  command := flag.Arg(0)
-
-  if command == "play" {
-    var url string
-    file := flag.Arg(1)
-    if _, err := os.Stat(file); err == nil {
-      url = makeFileRemotelyAccessibleToTv(myTv, file)
-    } else {
-      url = file
-    }
-
-    myTv.Stop()
-    myTv.LoadMedia(url)
-    myTv.Play(1)
-  } else if command == "pause" {
-    status := myTv.GetTransportInfo()
-    if status == tv.STATUS_PAUSED {
-      myTv.Play(1)
-    } else if status == tv.STATUS_PLAYING {
-      myTv.Pause()
-    } else {
-      log.Fatal("Not playing")
-    }
-  } else if command == "stop" {
-    myTv.Stop()
-  } else if command == "info" {
-    status := myTv.GetTransportInfo()
-    posInfo := myTv.GetPositionInfo()
-    fmt.Printf("Url: %s\n%s  -  Progress: %d/%d\n", posInfo.URI, status, posInfo.Position, posInfo.Duration)
-  } else {
-    log.Fatal("Unknown command")
-  }
-
-  // We may have spun up a HTTP server, so wait for it to not be in use. If we
-  // are serving a remote URL, we'll just return immediately.
-  wg.Wait()
-}
