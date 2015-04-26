@@ -19,6 +19,7 @@ var wg sync.WaitGroup
 func main() {
   log.SetFlags(0)
   tvUrl := flag.String("tv", os.Getenv("TV_CONTROL_URL"), "URL for TV.")
+  listenAddress := flag.String("l", ":2222", "Address for server to listen on.")
   flag.Parse()
 
   if flag.NArg() < 1 {
@@ -48,7 +49,7 @@ func main() {
     posInfo := myTv.GetPositionInfo()
     fmt.Printf("Url: %s\n%s  -  Progress: %d/%d\n", posInfo.URI, status, posInfo.Position, posInfo.Duration)
   } else if command == "server" {
-    s, err := server.New(&myTv, ":2222")
+    s, err := server.New(&myTv, *listenAddress)
     if err != nil {
       log.Fatal(err)
     }
