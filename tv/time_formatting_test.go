@@ -13,3 +13,11 @@ func TestTimeFoematting(t * testing.T) {
     }
   }
 }
+
+func TestShortTimes(t * testing.T) {
+  time := 10
+  formatted := formatTime(time)
+  if formatted != "00:00:10" {
+    t.Error("Put in", time, "and got out", formatted)
+  }
+}

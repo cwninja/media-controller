@@ -5,6 +5,8 @@ import "github.com/cwninja/media-controller/tv"
 import "github.com/yasuyuky/jsonpath"
 import "bufio"
 import "log"
+import "time"
+import jsonEncoding "encoding/json"
 
 
 type Server struct {
@@ -39,8 +41,34 @@ func (s * Server) HandleConnection(c * net.TCPConn) {
   messageScanner := bufio.NewScanner(c)
   for messageScanner.Scan() {
     if json, err := jsonpath.DecodeString(messageScanner.Text()); err == nil {
-      v, _ := jsonpath.GetString(json, []interface{}{"type"}, "")
-      log.Printf(v)
+      command, _ := jsonpath.GetString(json, []interface{}{"command"}, "")
+      if command == "stop" || command == "exit" {
+        s.TV.Stop()
+      } else if command == "pause" {
+        s.TV.Pause()
+      } else if command == "play" {
+        url, _ := jsonpath.GetString(json, []interface{}{"url"}, "")
+        position, _ := jsonpath.GetNumber(json, []interface{}{"position"}, 0)
+        log.Printf("No seek support implemnted: %f", position)
+        s.TV.Play(url)
+      } else if command == "status" {
+        if data, err := jsonEncoding.Marshal(s.TV.Status()); err == nil {
+          c.Write(data)
+          c.Write([]byte{'\n'})
+        } else {
+          log.Fatal(err)
+        }
+      } else if command == "monitor" {
+        for {
+          if data, err := jsonEncoding.Marshal(s.TV.Status()); err == nil {
+            c.Write(data)
+            c.Write([]byte{'\n'})
+          } else {
+            log.Fatal(err)
+          }
+          time.Sleep(time.Second)
+        }
+      }
     }
   }
 }

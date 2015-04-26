@@ -21,6 +21,15 @@ func (tv * TV) Play(url string) {
   tv.sendSoapMessage(messages.Play(1))
 }
 
+func (tv * TV) SeekTo(seconds int) {
+  tv.sendSoapMessage(messages.Seek(messages.SEEK_REL_TIME, formatTime(seconds)))
+}
+
+func (tv * TV) SeekBy(seconds int) {
+  seconds = seconds + tv.Status().Position
+  tv.sendSoapMessage(messages.Seek(messages.SEEK_REL_TIME, formatTime(seconds)))
+}
+
 func (tv * TV) Stop() {
   tv.sendSoapMessage(messages.Stop())
 }
@@ -32,4 +41,27 @@ func (tv * TV) Pause() {
   } else if status == STATUS_PLAYING {
     tv.sendSoapMessage(messages.Pause())
   }
+}
+
+func (tv * TV) Status() Status {
+  positionInfo := tv.GetPositionInfo()
+  transportInfo := tv.GetTransportInfo()
+
+  if transportInfo == STATUS_STOPPED {
+    return Status{}
+  } else {
+    return Status{
+      Paused: transportInfo == STATUS_PAUSED,
+      Length: positionInfo.Duration,
+      Position: positionInfo.Position,
+      Url: positionInfo.URI,
+    }
+  }
+}
+
+type Status struct {
+  Paused bool `json:"paused"`
+  Length int `json:"length"`
+  Position int `json:"position"`
+  Url string `json:"url"`
 }

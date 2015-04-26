@@ -14,5 +14,5 @@ func formatTime(secs int) string {
   s := secs % 60
   m := (secs / 60) % 60
   h := (secs / (60*60))
-  return fmt.Sprintf("%d:%d:%d", h, m, s)
+  return fmt.Sprintf("%02d:%02d:%02d", h, m, s)
 }

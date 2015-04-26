@@ -110,3 +110,21 @@ func TestGetPositionInfo(t * testing.T) {
     t.Error(soapAction)
   }
 }
+
+func TestSeek(t * testing.T) {
+  reader, soapAction := Seek(SEEK_REL_TIME, "0:0:10")
+
+  buf := new(bytes.Buffer)
+  buf.ReadFrom(reader)
+  val := buf.String()
+
+  expectedMessage := `<Envelope xmlns="http://schemas.xmlsoap.org/soap/envelope/" xmlns:envelope="http://schemas.xmlsoap.org/soap/envelope/" envelope:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><Body xmlns="http://schemas.xmlsoap.org/soap/envelope/"><Seek xmlns="urn:schemas-upnp-org:service:AVTransport:1"><InstanceID xmlns="urn:schemas-upnp-org:service:AVTransport:1">0</InstanceID><Target xmlns="urn:schemas-upnp-org:service:AVTransport:1">0:0:10</Target><Unit xmlns="urn:schemas-upnp-org:service:AVTransport:1">REL_TIME</Unit></Seek></Body></Envelope>`
+  if val != expectedMessage {
+    t.Error(val)
+  }
+
+  expectedSoapAction := `urn:schemas-upnp-org:service:AVTransport:1#Seek`
+  if soapAction != expectedSoapAction {
+    t.Error(soapAction)
+  }
+}

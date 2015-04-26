@@ -11,6 +11,7 @@ import urlParser "net/url"
 import "net/http"
 import "net"
 import "time"
+import "strconv"
 
 // A global wait group to decide when it's OK to exit the process.
 var wg sync.WaitGroup
@@ -52,6 +53,12 @@ func main() {
       log.Fatal(err)
     }
     s.Start()
+  } else if command == "seekby" {
+    time,_ := strconv.Atoi(flag.Arg(1))
+    myTv.SeekBy(time)
+  } else if command == "seekto" {
+    time,_ := strconv.Atoi(flag.Arg(1))
+    myTv.SeekTo(time)
   } else {
     log.Fatal("Unknown command")
   }

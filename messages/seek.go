@@ -8,11 +8,10 @@ func Seek(mode seekMode, target string) (io.Reader, string) {
     InstanceID: "0",
     Target: target,
     Unit: mode,
-  }), NAMESPACE + "#GetPositionInfo"
+  }), NAMESPACE + "#Seek"
 }
 
 const (
-  SEEK_ABS_TIME = seekMode("ABS_TIME")
   SEEK_REL_TIME = seekMode("REL_TIME")
 )
 
