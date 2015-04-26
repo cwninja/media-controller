@@ -64,13 +64,18 @@ func (s * Server) HandleConnection(c * net.TCPConn) {
         seconds, _ := jsonpath.GetNumber(json, []interface{}{"seconds"}, 0)
         s.TV.SeekBy(int(seconds))
       } else if command == "monitor" || command == "subscribe" {
+        lastStatus := tv.Status{Url: "none"}
         for {
-          data, _ := jsonEncoding.Marshal(s.TV.Status())
-          if _, err := c.Write(data); err != nil {
-            return
-          }
-          if _, err := c.Write([]byte{'\n'}); err != nil {
-            return
+          newStatus := s.TV.Status()
+          if newStatus != lastStatus {
+            lastStatus = newStatus
+            data, _ := jsonEncoding.Marshal(lastStatus)
+            if _, err := c.Write(data); err != nil {
+              return
+            }
+            if _, err := c.Write([]byte{'\n'}); err != nil {
+              return
+            }
           }
           time.Sleep(time.Second)
         }
