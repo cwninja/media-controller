@@ -1,6 +1,7 @@
 package main
 
 import "github.com/cwninja/media-controller/tv"
+import "github.com/cwninja/media-controller/server"
 import "flag"
 import "log"
 import "fmt"
@@ -45,6 +46,12 @@ func main() {
     status := myTv.GetTransportInfo()
     posInfo := myTv.GetPositionInfo()
     fmt.Printf("Url: %s\n%s  -  Progress: %d/%d\n", posInfo.URI, status, posInfo.Position, posInfo.Duration)
+  } else if command == "server" {
+    s, err := server.New(&myTv, ":2222")
+    if err != nil {
+      log.Fatal(err)
+    }
+    s.Start()
   } else {
     log.Fatal("Unknown command")
   }
