@@ -38,6 +38,7 @@ func (s * Server) Start() {
 }
 
 func (s * Server) HandleConnection(c * net.TCPConn) {
+  defer c.Close()
   messageScanner := bufio.NewScanner(c)
   for messageScanner.Scan() {
     if json, err := jsonpath.DecodeString(messageScanner.Text()); err == nil {
@@ -65,8 +66,12 @@ func (s * Server) HandleConnection(c * net.TCPConn) {
       } else if command == "monitor" {
         for {
           data, _ := jsonEncoding.Marshal(s.TV.Status())
-          c.Write(data)
-          c.Write([]byte{'\n'})
+          if _, err := c.Write(data); err != nil {
+            return
+          }
+          if _, err := c.Write([]byte{'\n'}); err != nil {
+            return
+          }
           time.Sleep(time.Second)
         }
       }
