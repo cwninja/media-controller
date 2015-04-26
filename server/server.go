@@ -44,7 +44,7 @@ func (s * Server) HandleConnection(c * net.TCPConn) {
     if json, err := jsonpath.DecodeString(messageScanner.Text()); err == nil {
       command, _ := jsonpath.GetString(json, []interface{}{"command"}, "")
       if command == "players" {
-        c.Write(bytes.NewBufferString("{\"default\":\"http://example.com/multiple-players-not-supported\"}\n").Bytes())
+        c.Write(bytes.NewBufferString("[\"default\"]\n").Bytes())
       } else if command == "stop" || command == "exit" {
         s.TV.Stop()
       } else if command == "pause" {
@@ -63,7 +63,7 @@ func (s * Server) HandleConnection(c * net.TCPConn) {
       } else if command == "seek_by" {
         seconds, _ := jsonpath.GetNumber(json, []interface{}{"seconds"}, 0)
         s.TV.SeekBy(int(seconds))
-      } else if command == "monitor" {
+      } else if command == "monitor" || command == "subscribe" {
         for {
           data, _ := jsonEncoding.Marshal(s.TV.Status())
           if _, err := c.Write(data); err != nil {
