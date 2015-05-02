@@ -50,6 +50,10 @@ func (tv * TV) Pause() {
   }
 }
 
+func (tv * TV) Length() int {
+  return tv.Status().Length;
+}
+
 func (tv * TV) Status() Status {
   positionInfo := tv.GetPositionInfo()
   transportInfo := tv.GetTransportInfo()

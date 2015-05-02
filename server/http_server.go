@@ -24,8 +24,10 @@ func GetRouter(tv * tv.TV) http.Handler {
   })
 
   r.Methods("POST").Path("/seek").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-    if seekPosition, e := strconv.Atoi(r.PostFormValue("to")); e == nil {
-      tv.SeekTo(seekPosition)
+    if seekPercent, e := strconv.ParseFloat(r.PostFormValue("to"), 64); e == nil {
+      length := tv.Length()
+      seekPosition := seekPercent * float64(length) / 100.0
+      tv.SeekTo(int(seekPosition))
     } else if seekBy, e := strconv.Atoi(r.PostFormValue("by")); e == nil {
       tv.SeekBy(seekBy)
     } else {
