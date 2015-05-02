@@ -57,7 +57,15 @@ func main() {
     if err != nil {
       log.Fatal(err)
     }
-    s.Start()
+    go s.Start()
+
+    httpServer := &http.Server{
+      Addr: ":8081",
+      Handler: server.GetRouter(&myTv),
+    }
+    go httpServer.ListenAndServe()
+
+    wg.Add(1)
   } else if command == "seekby" {
     time,_ := strconv.Atoi(flag.Arg(1))
     myTv.SeekBy(time)
