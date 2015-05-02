@@ -19,7 +19,8 @@ var wg sync.WaitGroup
 func main() {
   log.SetFlags(0)
   tvUrl := flag.String("tv", os.Getenv("TV_CONTROL_URL"), "URL for TV.")
-  listenAddress := flag.String("l", ":2222", "Address for server to listen on.")
+  listenAddress := flag.String("listen", ":2222", "Address for server to listen on.")
+  webListenAddress := flag.String("listen-web", ":8081", "Address for web server to listen on.")
   flag.Parse()
 
   if flag.NArg() < 1 {
@@ -60,7 +61,7 @@ func main() {
     go s.Start()
 
     httpServer := &http.Server{
-      Addr: ":8081",
+      Addr: *webListenAddress,
       Handler: server.GetRouter(&myTv),
     }
     go httpServer.ListenAndServe()
