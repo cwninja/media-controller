@@ -48,7 +48,7 @@ func main() {
     myTv.Pause()
   } else if command == "stop" {
     myTv.Stop()
-  } else if command == "info" {
+  } else if command == "status" {
     status := myTv.GetTransportInfo()
     posInfo := myTv.GetPositionInfo()
     fmt.Printf("Url: %s\n%s  -  Progress: %d/%d\n", posInfo.URI, status, posInfo.Position, posInfo.Duration)
