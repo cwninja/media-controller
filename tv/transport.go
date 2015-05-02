@@ -11,7 +11,7 @@ import "errors"
 func (tv * TV) sendSoapMessage(body io.Reader, action string) (responseBody []byte, err error) {
   request, err := http.NewRequest("POST", tv.Url, body)
   if err != nil {
-    return
+    log.Fatalf("Could not build HTTP request: %s", err)
   }
 
   request.Header.Set("Content-Type", "text/xml")
@@ -24,7 +24,6 @@ func (tv * TV) sendSoapMessage(body io.Reader, action string) (responseBody []by
 
   if response.StatusCode != 200 {
     io.Copy(os.Stderr, response.Body)
-    log.Println(response.Status)
     return responseBody, errors.New(response.Status)
   }
 
