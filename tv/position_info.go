@@ -6,39 +6,39 @@ import "log"
 import "bytes"
 
 type PositionInfo struct {
-  URI string
-  Position int
-  Duration int
+	URI      string
+	Position int
+	Duration int
 }
 
-func (tv * TV) GetPositionInfo() (info PositionInfo) {
-  response, err := tv.sendSoapMessage(messages.GetPositionInfo())
-  if err != nil {
-    log.Println(err)
-    return
-  }
+func (tv *TV) GetPositionInfo() (info PositionInfo) {
+	response, err := tv.sendSoapMessage(messages.GetPositionInfo())
+	if err != nil {
+		log.Println(err)
+		return
+	}
 
-  trackUriPath := xmlpath.MustCompile("//TrackURI")
-  trackLengthPath := xmlpath.MustCompile("//TrackDuration")
-  trackPos := xmlpath.MustCompile("//AbsTime")
+	trackUriPath := xmlpath.MustCompile("//TrackURI")
+	trackLengthPath := xmlpath.MustCompile("//TrackDuration")
+	trackPos := xmlpath.MustCompile("//RelTime")
 
-  root, err := xmlpath.Parse(bytes.NewBuffer(response))
-  if err != nil {
-    log.Println(err)
-    return
-  }
+	root, err := xmlpath.Parse(bytes.NewBuffer(response))
+	if err != nil {
+		log.Println(err)
+		return
+	}
 
-  if value, ok := trackUriPath.String(root); ok {
-    info.URI = value
-  }
+	if value, ok := trackUriPath.String(root); ok {
+		info.URI = value
+	}
 
-  if value, ok := trackLengthPath.String(root); ok {
-    info.Duration = parseTime(value)
-  }
+	if value, ok := trackLengthPath.String(root); ok {
+		info.Duration = parseTime(value)
+	}
 
-  if value, ok := trackPos.String(root); ok {
-    info.Position = parseTime(value)
-  }
+	if value, ok := trackPos.String(root); ok {
+		info.Position = parseTime(value)
+	}
 
-  return
+	return
 }
